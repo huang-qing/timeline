@@ -49,7 +49,7 @@
                 //第一个子节点首先定位在Y轴反向位置，第二个子节点定位在Y轴正向与第一个节点对称的位置
                 if (nextY === startY) {
                     operator = -1;
-                    lineHeight = baseLineHeight + Math.floor((currentBranchCount / 2)) * offsetHeight;
+                    lineHeight = baseLineHeight + Math.floor(currentBranchCount / 2) * offsetHeight;
                     lineHeight = operator * (Math.abs(lineHeight) - offsetHeight);
                     nextY = startY + lineHeight;
                     setEndY(lineHeight);
@@ -88,7 +88,7 @@
                 }
 
                 if (url.indexOf("~") === 0) {
-                    host = location.protocol + "//" + location.hostname + (location.port ? (":" + location.port) : "");
+                    host = location.protocol + "//" + location.hostname + (location.port ? ":" + location.port : "");
                     url = url.replace(/~/, host);
                 }
 
@@ -133,9 +133,9 @@
                 });
 
                 pathStr = ["M", x + lineWidth, " ", y,
-                    "L", (x + lineWidth), " ", y + r,
-                    "L", (x + lineWidth + r), " ", y,
-                    "L", (x + lineWidth), " ", y - r,
+                    "L", x + lineWidth, " ", y + r,
+                    "L", x + lineWidth + r, " ", y,
+                    "L", x + lineWidth, " ", y - r,
                     "L", x + lineWidth, " ", y,
                     "z"].join("");
                 paper.path(pathStr).attr({
@@ -176,7 +176,7 @@
                 innerRectElement = paper.rect(x - 2 * paddingSize, y - paddingSize, width + 4 * paddingSize, height + 2 * paddingSize, radius).attr({
                     fill: bgColor,
                     "stroke-width": 0,
-                    stroke: bgColor,
+                    stroke: bgColor
                 });
                 outRectElement = paper.rect(x - 3 * paddingSize, y - 2 * paddingSize, width + 6 * paddingSize, height + 4 * paddingSize, radius).attr({
                     stroke: bgColor,
@@ -189,7 +189,7 @@
                 lineWidth = position.width;
 
                 getNextX(lineWidth);
-                endY === 0 ? endY = (Math.ceil(position.height / 2) + 6) : null;
+                endY === 0 ? endY = Math.ceil(position.height / 2) + 6 : null;
             }
 
             //创建中轴线上的线
