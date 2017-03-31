@@ -117,3 +117,16 @@ $(function () {
 ~~~
 
 ![示例效果](https://github.com/huang-qing/timeline/raw/master/timeline-demo.png)
+
+
+## 启动Web服务
+
+~~~
+cnpm install http-server -g
+~~~
+
+terminal:
+~~
+http-server
+~~
+

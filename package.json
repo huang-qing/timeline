@@ -1,0 +1,22 @@
+{
+  "name": "timeline",
+  "version": "1.0.0",
+  "description": "timeline 时间轴控件",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/huang-qing/timeline.git"
+  },
+  "keywords": [
+    "timeline"
+  ],
+  "author": "huangqing",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/huang-qing/timeline/issues"
+  },
+  "homepage": "https://github.com/huang-qing/timeline#readme"
+}

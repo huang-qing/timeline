@@ -10,11 +10,11 @@
  * Date: 2016-11-15
  */
 
-(function ($) {
+(function($) {
 
     'use strict';
     $.fn.extend({
-        timeline: function (opt) {
+        timeline: function(opt) {
 
             var container = this,
                 paper = Raphael(container[0]),
@@ -49,7 +49,7 @@
                 //第一个子节点首先定位在Y轴反向位置，第二个子节点定位在Y轴正向与第一个节点对称的位置
                 if (nextY === startY) {
                     operator = -1;
-                    lineHeight = baseLineHeight + Math.floor(currentBranchCount / 2) * offsetHeight;
+                    lineHeight = baseLineHeight + Math.ceil(currentBranchCount / 2) * offsetHeight;
                     lineHeight = operator * (Math.abs(lineHeight) - offsetHeight);
                     nextY = startY + lineHeight;
                     setEndY(lineHeight);
@@ -82,8 +82,7 @@
 
                 if (imageUrl) {
                     url = imageUrl;
-                }
-                else if (legend[legendType] && legend[legendType].icon) {
+                } else if (legend[legendType] && legend[legendType].icon) {
                     url = legend[legendType].icon;
                 }
 
@@ -137,7 +136,8 @@
                     "L", x + lineWidth + r, " ", y,
                     "L", x + lineWidth, " ", y - r,
                     "L", x + lineWidth, " ", y,
-                    "z"].join("");
+                    "z"
+                ].join("");
                 paper.path(pathStr).attr({
                     fill: bgColor,
                     "stroke-width": 0,
@@ -230,10 +230,12 @@
 
             //创建中轴线上分支节点的内容
             function createCentralAxisContent(x, y, text, imageUrl) {
+
                 var r = 10,
                     r_bottom = 2,
                     bgColor = "#F9BF3B",
                     textFillColor = "#ffffff",
+                    stroke = '#ffffff',
                     pathStr = "",
                     height = 24,
                     width = 0,
@@ -271,7 +273,8 @@
                 textElement = paper.text(_endX + 2 * r, _endY + operator * r * 1.5, text).attr({
                     "font-size": 12,
                     fill: textFillColor,
-                    "text-anchor": "start"
+                    "text-anchor": "start",
+                    title: text
                 });
 
                 position = textElement.getBBox();
@@ -281,11 +284,11 @@
 
                 paper.rect(_endX, _endY, position.width + 4 * r, height, 8).attr({
                     fill: bgColor,
-                    stroke: bgColor,
-                    "stroke-width": 0
+                    stroke: stroke,
+                    "stroke-width": 1
                 });
 
-                paper.image(imageUrl, _endX + r / 2, _endY + 2, imageSize, imageSize);
+                paper.image(imageUrl, _endX + r / 2, _endY + 3, imageSize, imageSize);
 
                 textElement.toFront();
             }
@@ -357,7 +360,7 @@
                 //创建开始节点
                 createStartNode(startX, startY);
                 //创建内容节点
-                for (var i = 0, len = data.length; i < len; i++) {
+                for (i = 0, len = data.length; i < len; i++) {
                     item = data[i];
                     text = item.text;
                     imageUrl = item.name;
@@ -369,8 +372,7 @@
                     if (children.length === 0 && i !== len - 1) {
                         //不存在分支节点，只创建中轴线
                         createCentralAxisLine(nextX, startY, r);
-                    }
-                    else if (children.length > 0) {
+                    } else if (children.length > 0) {
                         //重置nextY,新的主节点下的分支节点Y轴位置回复为初始位置
                         nextY = startY;
                         currentBranchCount = children.length;
@@ -402,4 +404,3 @@
     });
 
 })(jQuery);
-
