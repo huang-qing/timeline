@@ -26,7 +26,7 @@ $(function() {
             icon: "images/counter.png"
         }],
         data: [{
-                text: "bug",
+                text: "item0405/item0405/A.001",
                 children: [{
                     text: "测试：一个分支时定位不正确",
                     legendName: "1",

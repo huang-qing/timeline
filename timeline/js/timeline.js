@@ -10,11 +10,11 @@
  * Date: 2016-11-15
  */
 
-(function($) {
+(function ($) {
 
     'use strict';
     $.fn.extend({
-        timeline: function(opt) {
+        timeline: function (opt) {
 
             var container = this,
                 paper = Raphael(container[0]),
@@ -160,7 +160,7 @@
                     textFillColor = "#ffffff",
                     position,
                     lineWidth;
-
+                debugger;
                 x = x + 3 * paddingSize;
                 textElement = paper.text(x, y, text).attr({
                     "font-size": 12,
@@ -398,8 +398,9 @@
                 paper.setViewBox(-ViewBoxX, -ViewBoxY, pagerWidth, pagerHeight, false);
             }
 
+            container.addClass("timeline");
             init(opt);
-            return container.addClass("timeline");
+            return container;
         }
     });
 
