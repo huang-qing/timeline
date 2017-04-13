@@ -17,7 +17,7 @@
         timeline: function (opt) {
 
             var container = this,
-                paper = Raphael(container[0]),
+                paper = container.data('timeline'),
                 pagerHeight = 0,
                 pagerWidth = 0,
                 ViewBoxX = 0,
@@ -32,6 +32,14 @@
                 legend = {},
                 legendHeight = 60,
                 data = [];
+
+            if (!paper) {
+                paper = Raphael(container[0]);
+                container.data('timeline', paper);
+            }
+            else {
+                paper.clear();
+            }
 
             //计算下一节点的X轴起始位置
             function getNextX(offsetWidth) {
@@ -160,7 +168,7 @@
                     textFillColor = "#ffffff",
                     position,
                     lineWidth;
-                debugger;
+               
                 x = x + 3 * paddingSize;
                 textElement = paper.text(x, y, text).attr({
                     "font-size": 12,
