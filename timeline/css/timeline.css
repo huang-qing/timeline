@@ -1,3 +1,12 @@
 .timeline tspan {
     font-family: 微软雅黑;
+    cursor:default;
 }
+
+
+/*.timeline >svg,
+.timeline >div
+{
+    padding-left:2em;
+    padding-right:2em;
+}*/

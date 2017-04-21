@@ -31,7 +31,30 @@
                 currentBranchCount = 0,
                 legend = {},
                 legendHeight = 60,
-                data = [];
+                data = [],
+                config = {
+                    centralAxisNode: {
+                        padding: 4,
+                        radius: 4,
+                        fill: "#1A84CE",
+                        color: "#ffffff"
+                    },
+                    centralAxisLine: {
+                        fill: "#7E899D"
+                    },
+                    centralAxisBranchNode: {
+                        fill: "#F9BF3B",
+                        radius: 10
+                    },
+                    centralAxisContent: {
+                        fill: "#F9BF3B",
+                        color: "#ffffff",
+                        stroke: '#ffffff',
+                        height: 24
+                    }
+                };
+
+            $.extend(true, config, opt.config);
 
             if (!paper) {
                 paper = Raphael(container[0]);
@@ -84,19 +107,30 @@
             }
 
             //获取图片url
+            //imageUrl:url字符串，或url数组
             function getImageUrl(imageUrl, legendType) {
-                var url = "",
+
+                var url = [],
+                    image,
                     host;
 
-                if (imageUrl) {
-                    url = imageUrl;
-                } else if (legend[legendType] && legend[legendType].icon) {
-                    url = legend[legendType].icon;
+                if (legend[legendType] && legend[legendType].icon) {
+                    url.push(legend[legendType].icon);
                 }
 
-                if (url.indexOf("~") === 0) {
-                    host = location.protocol + "//" + location.hostname + (location.port ? ":" + location.port : "");
-                    url = url.replace(/~/, host);
+                if (imageUrl && typeof imageUrl === 'string') {
+                    url.push(imageUrl);
+                }
+                else if (imageUrl instanceof Array && imageUrl.length > 0) {
+                    url = url.concat(imageUrl);
+                }
+
+                for (var i = 0, len = url.length; i < len; i++) {
+                    image = url[i];
+                    if (image.indexOf("~") === 0) {
+                        host = location.protocol + "//" + location.hostname + (location.port ? ":" + location.port : "");
+                        url[i] = image.replace(/~/, host);
+                    }
                 }
 
                 return url;
@@ -156,19 +190,21 @@
             }
 
             //创建中轴线上的主节点
-            function createCentralAxisNode(x, y, text) {
+            function createCentralAxisNode(x, y, text, config) {
+
                 var width = 100,
                     height = 16,
                     innerRectElement,
                     outRectElement,
                     textElement,
-                    paddingSize = 4,
-                    radius = 4,
-                    bgColor = "#1A84CE",
-                    textFillColor = "#ffffff",
+                    config = config.centralAxisNode,
+                    paddingSize = config.padding,
+                    radius = config.radius,
+                    bgColor = config.fill,
+                    textFillColor = config.color,
                     position,
                     lineWidth;
-               
+
                 x = x + 3 * paddingSize;
                 textElement = paper.text(x, y, text).attr({
                     "font-size": 12,
@@ -201,10 +237,11 @@
             }
 
             //创建中轴线上的线
-            function createCentralAxisLine(x, y, radius) {
+            function createCentralAxisLine(x, y, radius, config) {
 
                 var r = 10,
-                    bgColor = "#7E899D",
+                    config = config.centralAxisLine,
+                    bgColor = config.fill,
                     lineWidth = 4 * r,
                     pathStr = "";
 
@@ -219,9 +256,10 @@
             }
 
             //创建中轴线上的分支节点
-            function createCentralAxisBranchNode(x, y) {
-                var r = 10,
-                    bgColor = "#F9BF3B";
+            function createCentralAxisBranchNode(x, y, config) {
+                var config = config.centralAxisBranchNode,
+                    r = config.radius,
+                    bgColor = config.fill;
 
                 paper.circle(x, y, r - 2).attr({
                     "stroke-width": 2,
@@ -237,22 +275,31 @@
             }
 
             //创建中轴线上分支节点的内容
-            function createCentralAxisContent(x, y, text, imageUrl) {
+            function createCentralAxisContent(x, y, text, imageUrl, config) {
 
                 var r = 10,
                     r_bottom = 2,
-                    bgColor = "#F9BF3B",
-                    textFillColor = "#ffffff",
-                    stroke = '#ffffff',
+                    config = config.centralAxisContent,
+                    bgColor = config.fill,
+                    textFillColor = config.color,
+                    stroke = config.stroke,
                     pathStr = "",
-                    height = 24,
+                    height = config.height,
                     width = 0,
                     index = index || 1,
                     offsetLineHeight = 2 * r,
                     operator = +1,
                     _endX = 0,
                     _endY = 0,
+                    contentX,
+                    contentY,
+                    imageX,
+                    imageY,
+                    imageWidth = 0,
+                    textX,
+                    textY,
                     textElement,
+                    imageElements = [],
                     imageSize = 14,
                     position;
 
@@ -275,10 +322,33 @@
                 });
 
                 _endX = x - 2 * r;
-                _endY = operator > 0 ? _endY - operator * (height * 1.2 + 6) :
-                    _endY - operator * (height + 6);
+                _endY = operator > 0 ? _endY - operator * (height + 6) :
+                    _endY - operator * 6;
 
-                textElement = paper.text(_endX + 2 * r, _endY + operator * r * 1.5, text).attr({
+                contentX = _endX;
+                contentY = _endY;
+                imageX = contentX;
+
+                if (imageUrl && imageUrl.length > 0) {
+
+
+                    imageX = contentX + r / 2;
+                    imageY = contentY + 4;
+                    for (var i = 0, len = imageUrl.length; i < len; i++) {
+                        imageElements.push(paper.image(imageUrl[i], imageX, imageY, imageSize, imageSize));
+                        if (i !== len - 1) {
+                            imageX += r / 2 + imageSize;
+                        }
+                        else {
+                            imageX += r;
+                        }
+                    }
+                    imageWidth = imageX - contentX;
+                }
+
+                textX = imageX + r;
+                textY = contentY + r;
+                textElement = paper.text(textX, textY, text).attr({
                     "font-size": 12,
                     fill: textFillColor,
                     "text-anchor": "start",
@@ -288,27 +358,28 @@
                 position = textElement.getBBox();
                 width = position.width;
                 height = position.height + 5;
-                _endY = position.y - 2;
 
-                paper.rect(_endX, _endY, position.width + 4 * r, height, 8).attr({
+                paper.rect(contentX, contentY, imageWidth + position.width + 2 * r, height, 8).attr({
                     fill: bgColor,
                     stroke: stroke,
                     "stroke-width": 1
                 });
 
-                paper.image(imageUrl, _endX + r / 2, _endY + 3, imageSize, imageSize);
 
+                for (i = 0, len = imageElements.length; i < len; i++) {
+                    imageElements[i].toFront();
+                }
                 textElement.toFront();
             }
 
             //创建中轴线上的分支节点
-            function createBranchNode(x, y, text, imageUrl, radius) {
+            function createBranchNode(x, y, text, imageUrl, radius, config) {
                 var r = radius;
-                createCentralAxisLine(x, y, r);
+                createCentralAxisLine(x, y, r, config);
                 //中间位置
                 x += r * 2;
-                createCentralAxisBranchNode(x, y);
-                createCentralAxisContent(x, y, text, imageUrl);
+                createCentralAxisBranchNode(x, y, config);
+                createCentralAxisContent(x, y, text, imageUrl, config);
             }
 
             //创建图例
@@ -348,6 +419,7 @@
             }
 
             function init(opt) {
+
                 var _legend,
                     children = [],
                     item,
@@ -366,7 +438,7 @@
                 }
 
                 //创建开始节点
-                createStartNode(startX, startY);
+                createStartNode(startX, startY, config);
                 //创建内容节点
                 for (i = 0, len = data.length; i < len; i++) {
                     item = data[i];
@@ -375,11 +447,11 @@
                     children = item.children || [];
                     r = 10;
                     //创建主节点
-                    createCentralAxisNode(nextX, startY, text);
+                    createCentralAxisNode(nextX, startY, text, config);
                     //创建分支节点
                     if (children.length === 0 && i !== len - 1) {
                         //不存在分支节点，只创建中轴线
-                        createCentralAxisLine(nextX, startY, r);
+                        createCentralAxisLine(nextX, startY, r, config);
                     } else if (children.length > 0) {
                         //重置nextY,新的主节点下的分支节点Y轴位置回复为初始位置
                         nextY = startY;
@@ -389,7 +461,7 @@
                             item = children[j];
                             text = item.text;
                             imageUrl = getImageUrl(item.imageUrl, item.legendName);
-                            createBranchNode(nextX, startY, text, imageUrl, r);
+                            createBranchNode(nextX, startY, text, imageUrl, r, config);
                         }
                     }
                 }
@@ -409,7 +481,7 @@
             container.addClass("timeline");
             init(opt);
             return container;
-        }
+        },
     });
 
 })(jQuery);
