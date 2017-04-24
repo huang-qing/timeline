@@ -32,35 +32,14 @@
                 legend = {},
                 legendHeight = 60,
                 data = [],
-                config = {
-                    centralAxisNode: {
-                        padding: 4,
-                        radius: 4,
-                        fill: "#1A84CE",
-                        color: "#ffffff"
-                    },
-                    centralAxisLine: {
-                        fill: "#7E899D"
-                    },
-                    centralAxisBranchNode: {
-                        fill: "#F9BF3B",
-                        radius: 10
-                    },
-                    centralAxisContent: {
-                        fill: "#F9BF3B",
-                        color: "#ffffff",
-                        stroke: '#ffffff',
-                        height: 24
-                    }
-                };
+                theme = $.extend(true, {}, opt.theme || $.timeline.theme.gray);
 
-            $.extend(true, config, opt.config);
+            $.extend(true, theme, opt.theme);
 
             if (!paper) {
                 paper = Raphael(container[0]);
                 container.data('timeline', paper);
-            }
-            else {
+            } else {
                 paper.clear();
             }
 
@@ -120,8 +99,7 @@
 
                 if (imageUrl && typeof imageUrl === 'string') {
                     url.push(imageUrl);
-                }
-                else if (imageUrl instanceof Array && imageUrl.length > 0) {
+                } else if (imageUrl instanceof Array && imageUrl.length > 0) {
                     url = url.concat(imageUrl);
                 }
 
@@ -138,8 +116,8 @@
 
             //创建开始节点
             function createStartNode(x, y) {
-                var r = 10,
-                    bgColor = "#7E899D",
+                var r = theme.startNode.radius,
+                    bgColor = theme.startNode.fill,
                     lineWidth = 80;
 
                 x += r;
@@ -161,8 +139,8 @@
 
             //创建结束节点
             function createEndNode(x, y) {
-                var r = 10,
-                    bgColor = "#7E899D",
+                var r = theme.endNode.radius,
+                    bgColor = theme.endNode.fill,
                     lineWidth = 60,
                     pathStr = "";
 
@@ -190,18 +168,19 @@
             }
 
             //创建中轴线上的主节点
-            function createCentralAxisNode(x, y, text, config) {
+            function createCentralAxisNode(x, y, text, theme) {
 
-                var width = 100,
-                    height = 16,
+                var theme = theme.centralAxisNode,
+                    width = 100,
+                    height = theme.height,
                     innerRectElement,
                     outRectElement,
                     textElement,
-                    config = config.centralAxisNode,
-                    paddingSize = config.padding,
-                    radius = config.radius,
-                    bgColor = config.fill,
-                    textFillColor = config.color,
+
+                    paddingSize = 4,
+                    radius = theme.radius,
+                    bgColor = theme.fill,
+                    textFillColor = theme.color,
                     position,
                     lineWidth;
 
@@ -212,17 +191,16 @@
                     "text-anchor": "start"
                 });
 
-
                 position = textElement.getBBox();
                 width = position.width;
-                y = position.y;
 
-                innerRectElement = paper.rect(x - 2 * paddingSize, y - paddingSize, width + 4 * paddingSize, height + 2 * paddingSize, radius).attr({
+                innerRectElement = paper.rect(x - 2 * paddingSize, y - height / 2, width + 4 * paddingSize, height, radius).attr({
                     fill: bgColor,
                     "stroke-width": 0,
                     stroke: bgColor
                 });
-                outRectElement = paper.rect(x - 3 * paddingSize, y - 2 * paddingSize, width + 6 * paddingSize, height + 4 * paddingSize, radius).attr({
+
+                outRectElement = paper.rect(x - 3 * paddingSize, y - height / 2 - paddingSize, width + 6 * paddingSize, height + 2 * paddingSize, radius).attr({
                     stroke: bgColor,
                     "stroke-width": 3
                 });
@@ -237,11 +215,11 @@
             }
 
             //创建中轴线上的线
-            function createCentralAxisLine(x, y, radius, config) {
+            function createCentralAxisLine(x, y, radius, theme) {
 
                 var r = 10,
-                    config = config.centralAxisLine,
-                    bgColor = config.fill,
+                    theme = theme.centralAxisLine,
+                    bgColor = theme.fill,
                     lineWidth = 4 * r,
                     pathStr = "";
 
@@ -256,17 +234,17 @@
             }
 
             //创建中轴线上的分支节点
-            function createCentralAxisBranchNode(x, y, config) {
-                var config = config.centralAxisBranchNode,
-                    r = config.radius,
-                    bgColor = config.fill;
+            function createCentralAxisBranchNode(x, y, theme) {
+                var theme = theme.centralAxisBranchNode,
+                    r = theme.radius,
+                    bgColor = theme.fill;
 
                 paper.circle(x, y, r - 2).attr({
                     "stroke-width": 2,
                     stroke: bgColor
                 });
 
-                paper.circle(x, y, r - 6).attr({
+                paper.circle(x, y, r - 5).attr({
                     fill: bgColor,
                     "stroke-width": 0,
                     stroke: bgColor
@@ -275,16 +253,17 @@
             }
 
             //创建中轴线上分支节点的内容
-            function createCentralAxisContent(x, y, text, imageUrl, config) {
+            function createCentralAxisBranchContent(x, y, text, imageUrl, theme) {
 
                 var r = 10,
                     r_bottom = 2,
-                    config = config.centralAxisContent,
-                    bgColor = config.fill,
-                    textFillColor = config.color,
-                    stroke = config.stroke,
+                    content_theme = theme.centralAxisBranchContent,
+                    line_theme = theme.centralAxisBranchLine,
+                    bgColor = content_theme.fill,
+                    textFillColor = content_theme.color,
+                    stroke = content_theme.stroke,
                     pathStr = "",
-                    height = config.height,
+                    height = content_theme.height,
                     width = 0,
                     index = index || 1,
                     offsetLineHeight = 2 * r,
@@ -312,13 +291,13 @@
                 pathStr = "M" + x + " " + y + "L" + x + " " + _endY;
                 paper.path(pathStr).attr({
                     "stroke-width": 1,
-                    stroke: bgColor
+                    stroke: line_theme.stroke
                 });
 
                 paper.circle(x, _endY - operator * r_bottom, r_bottom).attr({
-                    fill: bgColor,
+                    fill: line_theme.stroke,
                     "stroke-width": 0,
-                    stroke: bgColor
+                    stroke: line_theme.stroke
                 });
 
                 _endX = x - 2 * r;
@@ -338,8 +317,7 @@
                         imageElements.push(paper.image(imageUrl[i], imageX, imageY, imageSize, imageSize));
                         if (i !== len - 1) {
                             imageX += r / 2 + imageSize;
-                        }
-                        else {
+                        } else {
                             imageX += r;
                         }
                     }
@@ -359,7 +337,7 @@
                 width = position.width;
                 height = position.height + 5;
 
-                paper.rect(contentX, contentY, imageWidth + position.width + 2 * r, height, 8).attr({
+                paper.rect(contentX, contentY, imageWidth + position.width + 2 * r, height,6).attr({
                     fill: bgColor,
                     stroke: stroke,
                     "stroke-width": 1
@@ -373,13 +351,13 @@
             }
 
             //创建中轴线上的分支节点
-            function createBranchNode(x, y, text, imageUrl, radius, config) {
+            function createBranchNode(x, y, text, imageUrl, radius, theme) {
                 var r = radius;
-                createCentralAxisLine(x, y, r, config);
+                createCentralAxisLine(x, y, r, theme);
                 //中间位置
                 x += r * 2;
-                createCentralAxisBranchNode(x, y, config);
-                createCentralAxisContent(x, y, text, imageUrl, config);
+                createCentralAxisBranchNode(x, y, theme);
+                createCentralAxisBranchContent(x, y, text, imageUrl, theme);
             }
 
             //创建图例
@@ -407,7 +385,7 @@
                     _startX += imageSize;
                     textElement = paper.text(_startX, _startY, text).attr({
                         "font-size": 12,
-                        fill: "#000000",
+                        "fill": theme.lengend.fill,
                         "text-anchor": "start"
                     });
 
@@ -438,7 +416,7 @@
                 }
 
                 //创建开始节点
-                createStartNode(startX, startY, config);
+                createStartNode(startX, startY, theme);
                 //创建内容节点
                 for (i = 0, len = data.length; i < len; i++) {
                     item = data[i];
@@ -447,11 +425,11 @@
                     children = item.children || [];
                     r = 10;
                     //创建主节点
-                    createCentralAxisNode(nextX, startY, text, config);
+                    createCentralAxisNode(nextX, startY, text, theme);
                     //创建分支节点
                     if (children.length === 0 && i !== len - 1) {
                         //不存在分支节点，只创建中轴线
-                        createCentralAxisLine(nextX, startY, r, config);
+                        createCentralAxisLine(nextX, startY, r, theme);
                     } else if (children.length > 0) {
                         //重置nextY,新的主节点下的分支节点Y轴位置回复为初始位置
                         nextY = startY;
@@ -461,7 +439,7 @@
                             item = children[j];
                             text = item.text;
                             imageUrl = getImageUrl(item.imageUrl, item.legendName);
-                            createBranchNode(nextX, startY, text, imageUrl, r, config);
+                            createBranchNode(nextX, startY, text, imageUrl, r, theme);
                         }
                     }
                 }
@@ -482,6 +460,87 @@
             init(opt);
             return container;
         },
+    });
+
+    $.extend({
+        timeline: {
+            theme: {
+                yellow: {
+                    lengend: {
+                        fill: "#000000",
+                    },
+                    startNode: {
+                        radius: 10,
+                        fill: "#7E899D"
+                    },
+                    endNode: {
+                        radius: 10,
+                        fill: "#7E899D"
+                    },
+                    centralAxisNode: {
+                        height: 21,
+                        //padding: 4,
+                        radius: 4,
+                        fill: "#1A84CE",
+                        color: "#ffffff"
+                    },
+                    centralAxisLine: {
+                        fill: "#7E899D"
+                    },
+                    centralAxisBranchNode: {
+                        fill: "#F9BF3B",
+                        radius: 10
+                    },
+                    centralAxisBranchLine: {
+                        stroke: '#F9BF3B',
+                        fill: "#F9BF3B"
+                    },
+                    centralAxisBranchContent: {
+                        fill: "#F9BF3B",
+                        color: "#ffffff",
+                        stroke: '#ffffff',
+                        height: 24
+                    }
+                },
+                gray: {
+                    lengend: {
+                        fill: "#5A5A5A",
+                    },
+                    startNode: {
+                        radius: 6,
+                        fill: "#7E899D"
+                    },
+                    endNode: {
+                        radius: 6,
+                        fill: "#7E899D"
+                    },
+                    centralAxisNode: {
+                        height: 16,
+                        //padding: 2,
+                        radius: 2,
+                        fill: "#1A84CE",
+                        color: "#ffffff"
+                    },
+                    centralAxisLine: {
+                        fill: "#7E899D"
+                    },
+                    centralAxisBranchNode: {
+                        fill: "#7E899D",
+                        radius: 8
+                    },
+                    centralAxisBranchLine: {
+                        stroke: '#526079',
+                        fill: "'#526079"
+                    },
+                    centralAxisBranchContent: {
+                        fill: "#FFFFFF",
+                        color: "#111111",
+                        stroke: '#526079',
+                        height: 24
+                    }
+                }
+            }
+        }
     });
 
 })(jQuery);
