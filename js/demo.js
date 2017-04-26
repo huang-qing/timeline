@@ -27,6 +27,7 @@ $(function () {
         }],
         data: [{
                 text: "item0405/item0405/A.001",
+                imageUrl: "images/counter.png",
                 children: [{
                     text: "测试：一个分支时定位不正确",
                     legendName: "1",
@@ -35,6 +36,7 @@ $(function () {
             },
             {
                 text: "主节点1",
+                imageUrl: ["images/counter.png", "images/counter.png"],
                 children: [{
                     text: "1-1:图例1-测试-images/compact_disc.png",
                     legendName: "1",
@@ -54,7 +56,7 @@ $(function () {
                 }, {
                     text: "1-5",
                     legendName: "5",
-                    imageUrl: ""
+                    imageUrl: ["images/counter.png", "images/counter.png", "images/counter.png"]
                 }, {
                     text: "1-6",
                     legendName: "6",
@@ -62,7 +64,8 @@ $(function () {
                 }]
             },
             {
-                text: "主节点2"
+                text: "主节点2",
+                imageUrl: ["images/counter.png", "images/counter.png", "images/counter.png"]
             },
             {
                 text: "主节点3",
@@ -218,10 +221,19 @@ $(function () {
             },
             centralAxisNode: {
                 height: 21,
-                //padding: 4,
                 radius: 4,
                 fill: "#1A84CE",
-                color: "#ffffff"
+                color: "#ffffff",
+                inner: {
+                    fill: "#1A84CE",
+                    "stroke-width": 0,
+                    stroke: "#1A84CE"
+                },
+                outer: {
+                    fill: "#1A84CE",
+                    "stroke-width": 3,
+                    stroke: "#1A84CE"
+                }
             },
             centralAxisLine: {
                 fill: "#7E899D"

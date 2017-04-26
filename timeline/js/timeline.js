@@ -32,7 +32,7 @@
                 legend = {},
                 legendHeight = 60,
                 data = [],
-                theme = $.extend(true, {}, opt.theme || $.timeline.theme.gray);
+                theme = $.extend(true, {}, $.timeline.theme.gray);
 
             $.extend(true, theme, opt.theme);
 
@@ -186,25 +186,49 @@
             }
 
             //创建中轴线上的主节点
-            function createCentralAxisNode(x, y, text) {
+            function createCentralAxisNode(x, y, text, imageUrl) {
 
                 var theme = getTheme().centralAxisNode,
+                    //r = 10,
                     width = 100,
                     height = theme.height,
                     innerRectElement,
                     outRectElement,
+                    imageX,
+                    imageY,
+                    imageWidth = 0,
+                    imageElements = [],
+                    imageSize = 14,
                     textElement,
-
                     paddingSize = 4,
                     radius = theme.radius,
-                    bgColor = theme.fill,
+                    fill = theme.fill,
+                    stroke = theme.stroke,
                     textFillColor = theme.color,
                     position,
-                    lineWidth;
+                    lineWidth,
+                    contentX = x,
+                    contentY = y;
 
-                x = x + 3 * paddingSize;
+                if (imageUrl && imageUrl.length > 0) {
+
+                    imageX = x + 2 * paddingSize;
+                    imageY = y - imageSize / 2 + 1;
+                    for (var i = 0, len = imageUrl.length; i < len; i++) {
+                        imageElements.push(paper.image(imageUrl[i], imageX, imageY, imageSize, imageSize));
+                        if (i !== len - 1) {
+                            imageX += paddingSize + imageSize;
+                        } else {
+                            imageX += paddingSize;
+                        }
+                    }
+                    imageWidth = imageX - x;
+                }
+
+                x = x + imageWidth + 3 * paddingSize;
                 textElement = paper.text(x, y, text).attr({
                     "font-size": 12,
+                    "font-weight": "bolder",
                     fill: textFillColor,
                     "text-anchor": "start"
                 });
@@ -212,18 +236,21 @@
                 position = textElement.getBBox();
                 width = position.width;
 
-                innerRectElement = paper.rect(x - 2 * paddingSize, y - height / 2, width + 4 * paddingSize, height, radius).attr({
-                    fill: bgColor,
-                    "stroke-width": 0,
-                    stroke: bgColor
+                innerRectElement = paper.rect(contentX + paddingSize, y - height / 2, width + 4 * paddingSize + imageWidth, height, radius).attr({
+                    fill: theme.inner.fill,
+                    "stroke-width": theme.inner["stroke-width"],
+                    stroke: theme.inner.stroke
                 });
 
-                outRectElement = paper.rect(x - 3 * paddingSize, y - height / 2 - paddingSize, width + 6 * paddingSize, height + 2 * paddingSize, radius).attr({
-                    stroke: bgColor,
-                    "stroke-width": 3
+                outRectElement = paper.rect(contentX, y - height / 2 - paddingSize, width + imageWidth + 6 * paddingSize, height + 2 * paddingSize, radius).attr({
+                    stroke: theme.outer.stroke,
+                    "stroke-width": theme.outer["stroke-width"]
                 });
 
                 textElement.toFront();
+                for (i = 0, len = imageElements.length; i < len; i++) {
+                    imageElements[i].toFront();
+                }
 
                 position = outRectElement.getBBox();
                 lineWidth = position.width;
@@ -288,7 +315,6 @@
                     operator = +1,
                     _endX = 0,
                     _endY = 0,
-                    //circleY = 0,
                     contentX,
                     contentY,
                     imageX,
@@ -325,12 +351,11 @@
 
                 contentX = _endX;
                 contentY = _endY;
-                imageX = contentX;
+                imageX = contentX + content_theme["padding"];
 
                 if (imageUrl && imageUrl.length > 0) {
 
-
-                    imageX = contentX + r / 2;
+                    imageX = imageX + r / 2;
                     imageY = contentY + 4;
                     for (var i = 0, len = imageUrl.length; i < len; i++) {
                         imageElements.push(paper.image(imageUrl[i], imageX, imageY, imageSize, imageSize));
@@ -356,7 +381,7 @@
                 width = position.width;
                 height = position.height + 5;
 
-                paper.rect(contentX, contentY, imageWidth + position.width + 2 * r, height, 6).attr({
+                paper.rect(contentX, contentY, imageWidth + position.width + content_theme["padding"] + 2 * r, height, content_theme.radius).attr({
                     fill: bgColor,
                     stroke: stroke,
                     "stroke-width": 1
@@ -443,11 +468,11 @@
                 for (i = 0, len = data.length; i < len; i++) {
                     item = data[i];
                     text = item.text;
-                    imageUrl = item.name;
+                    imageUrl = getImageUrl(item.imageUrl, null);
                     children = item.children || [];
                     r = 10;
                     //创建主节点
-                    createCentralAxisNode(nextX, startY, text);
+                    createCentralAxisNode(nextX, startY, text, imageUrl);
                     //创建分支节点
                     if (children.length === 0 && i !== len - 1) {
                         //不存在分支节点，只创建中轴线
@@ -504,10 +529,19 @@
                     },
                     centralAxisNode: {
                         height: 21,
-                        //padding: 4,
                         radius: 4,
                         fill: "#1A84CE",
-                        color: "#ffffff"
+                        color: "#ffffff",
+                        inner: {
+                            fill: "#1A84CE",
+                            "stroke-width": 0,
+                            stroke: "#1A84CE"
+                        },
+                        outer: {
+                            fill: "#1A84CE",
+                            "stroke-width": 3,
+                            stroke: "#1A84CE"
+                        }
                     },
                     centralAxisLine: {
                         fill: "#7E899D"
@@ -524,7 +558,9 @@
                         fill: "#F9BF3B",
                         color: "#ffffff",
                         stroke: '#ffffff',
-                        height: 24
+                        height: 24,
+                        radius: 6,
+                        "padding": 0
                     }
                 },
                 gray: {
@@ -540,11 +576,20 @@
                         fill: "#7E899D"
                     },
                     centralAxisNode: {
-                        height: 16,
-                        //padding: 2,
+                        height: 18,
                         radius: 2,
-                        fill: "#1A84CE",
-                        color: "#ffffff"
+                        //fill: "#1A84CE",
+                        color: "#1A84CE",
+                        inner: {
+                            fill: "#ffffff",
+                            "stroke-width": 0,
+                            stroke: "#1A84CE"
+                        },
+                        outer: {
+                            fill: "#1A84CE",
+                            "stroke-width": 2,
+                            stroke: "#1A84CE"
+                        }
                     },
                     centralAxisLine: {
                         fill: "#7E899D"
@@ -561,7 +606,9 @@
                         fill: "#FFFFFF",
                         color: "#111111",
                         stroke: '#526079',
-                        height: 24
+                        height: 24,
+                        radius: 12,
+                        "padding": 6
                     }
                 }
             }
