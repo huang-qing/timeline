@@ -78,6 +78,18 @@
                 }
             }
 
+            //设置x轴结束位置
+            function setEndX(x) {
+                if (endX < x) {
+                    endX = x;
+                }
+            }
+
+            //获取皮肤
+            function getTheme() {
+                return theme;
+            }
+
             //计算图形最高高度
             function setEndY(offsetHeight) {
                 if (Math.abs(endY) < Math.abs(offsetHeight)) {
@@ -116,8 +128,9 @@
 
             //创建开始节点
             function createStartNode(x, y) {
-                var r = theme.startNode.radius,
-                    bgColor = theme.startNode.fill,
+                var theme = getTheme().startNode,
+                    r = theme.radius,
+                    bgColor = theme.fill,
                     lineWidth = 80;
 
                 x += r;
@@ -139,11 +152,16 @@
 
             //创建结束节点
             function createEndNode(x, y) {
-                var r = theme.endNode.radius,
-                    bgColor = theme.endNode.fill,
+                var theme = getTheme().endNode,
+                    r = theme.radius,
+                    bgColor = theme.fill,
                     lineWidth = 60,
+                    _endX = x + lineWidth,
                     pathStr = "";
 
+                if (_endX < endX) {
+                    lineWidth = endX - x;
+                }
                 pathStr = "M" + x + " " + y + "L" + (x + lineWidth) + " " + y;
                 paper.path(pathStr).attr({
                     "stroke-width": 2,
@@ -168,9 +186,9 @@
             }
 
             //创建中轴线上的主节点
-            function createCentralAxisNode(x, y, text, theme) {
+            function createCentralAxisNode(x, y, text) {
 
-                var theme = theme.centralAxisNode,
+                var theme = getTheme().centralAxisNode,
                     width = 100,
                     height = theme.height,
                     innerRectElement,
@@ -215,10 +233,10 @@
             }
 
             //创建中轴线上的线
-            function createCentralAxisLine(x, y, radius, theme) {
+            function createCentralAxisLine(x, y, radius) {
 
                 var r = 10,
-                    theme = theme.centralAxisLine,
+                    theme = getTheme().centralAxisLine,
                     bgColor = theme.fill,
                     lineWidth = 4 * r,
                     pathStr = "";
@@ -234,8 +252,8 @@
             }
 
             //创建中轴线上的分支节点
-            function createCentralAxisBranchNode(x, y, theme) {
-                var theme = theme.centralAxisBranchNode,
+            function createCentralAxisBranchNode(x, y) {
+                var theme = getTheme().centralAxisBranchNode,
                     r = theme.radius,
                     bgColor = theme.fill;
 
@@ -253,12 +271,12 @@
             }
 
             //创建中轴线上分支节点的内容
-            function createCentralAxisBranchContent(x, y, text, imageUrl, theme) {
+            function createCentralAxisBranchContent(x, y, text, imageUrl) {
 
                 var r = 10,
                     r_bottom = 2,
-                    content_theme = theme.centralAxisBranchContent,
-                    line_theme = theme.centralAxisBranchLine,
+                    content_theme = getTheme().centralAxisBranchContent,
+                    line_theme = getTheme().centralAxisBranchLine,
                     bgColor = content_theme.fill,
                     textFillColor = content_theme.color,
                     stroke = content_theme.stroke,
@@ -270,6 +288,7 @@
                     operator = +1,
                     _endX = 0,
                     _endY = 0,
+                    //circleY = 0,
                     contentX,
                     contentY,
                     imageX,
@@ -302,7 +321,7 @@
 
                 _endX = x - 2 * r;
                 _endY = operator > 0 ? _endY - operator * (height + 6) :
-                    _endY - operator * 6;
+                    _endY - operator * 6 + r_bottom;
 
                 contentX = _endX;
                 contentY = _endY;
@@ -337,12 +356,15 @@
                 width = position.width;
                 height = position.height + 5;
 
-                paper.rect(contentX, contentY, imageWidth + position.width + 2 * r, height,6).attr({
+                paper.rect(contentX, contentY, imageWidth + position.width + 2 * r, height, 6).attr({
                     fill: bgColor,
                     stroke: stroke,
                     "stroke-width": 1
                 });
 
+                //判断分支内容的实际结束位置，用于作为生成结束节点的x轴参数
+                _endX = contentX + imageWidth + position.width + 2 * r;
+                setEndX(_endX);
 
                 for (i = 0, len = imageElements.length; i < len; i++) {
                     imageElements[i].toFront();
@@ -351,13 +373,13 @@
             }
 
             //创建中轴线上的分支节点
-            function createBranchNode(x, y, text, imageUrl, radius, theme) {
+            function createBranchNode(x, y, text, imageUrl, radius) {
                 var r = radius;
-                createCentralAxisLine(x, y, r, theme);
+                createCentralAxisLine(x, y, r);
                 //中间位置
                 x += r * 2;
-                createCentralAxisBranchNode(x, y, theme);
-                createCentralAxisBranchContent(x, y, text, imageUrl, theme);
+                createCentralAxisBranchNode(x, y);
+                createCentralAxisBranchContent(x, y, text, imageUrl);
             }
 
             //创建图例
@@ -416,7 +438,7 @@
                 }
 
                 //创建开始节点
-                createStartNode(startX, startY, theme);
+                createStartNode(startX, startY);
                 //创建内容节点
                 for (i = 0, len = data.length; i < len; i++) {
                     item = data[i];
@@ -425,11 +447,11 @@
                     children = item.children || [];
                     r = 10;
                     //创建主节点
-                    createCentralAxisNode(nextX, startY, text, theme);
+                    createCentralAxisNode(nextX, startY, text);
                     //创建分支节点
                     if (children.length === 0 && i !== len - 1) {
                         //不存在分支节点，只创建中轴线
-                        createCentralAxisLine(nextX, startY, r, theme);
+                        createCentralAxisLine(nextX, startY, r);
                     } else if (children.length > 0) {
                         //重置nextY,新的主节点下的分支节点Y轴位置回复为初始位置
                         nextY = startY;
@@ -439,12 +461,15 @@
                             item = children[j];
                             text = item.text;
                             imageUrl = getImageUrl(item.imageUrl, item.legendName);
-                            createBranchNode(nextX, startY, text, imageUrl, r, theme);
+                            createBranchNode(nextX, startY, text, imageUrl, r);
                         }
                     }
                 }
+
+                console.log(endX)
                 //创建结束节点
                 createEndNode(nextX, startY);
+
                 //创建图例
                 createLegend();
                 //设置画布大小
