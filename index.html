@@ -9,8 +9,17 @@
     <button id="reload">重新加载</button>
 </body>
 
-<script type="text/javascript" src="timeline/js/jquery-3.1.1.js"></script>
-<script type="text/javascript" src="timeline/js/raphael.js"></script>
+
+<!--[if (gt IE 8)|!(IE)]><!-->
+    <script type="text/javascript" src="timeline/js/jquery-3.1.1.js"></script>
+    <script type="text/javascript" src="timeline/js/raphael.js"></script>
+<!--<![endif]-->
+
+<!--[if lt IE 9]> 
+    <script type="text/javascript" src="timeline/js/jquery-1.11.3.js"></script>
+    <script type="text/javascript" src="timeline/js/raphael.js"></script>
+<![endif]-->
+
 <script type="text/javascript" src="timeline/js/timeline.js"></script>
 <script type="text/javascript" src="js/demo.js"></script>
 

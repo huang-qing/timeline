@@ -271,7 +271,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            width: 0,
 	            x: 0,
 	            y: 0,
-	            class: ""
+	            'class': ""
 	        },
 	        availableAnimAttrs = R._availableAnimAttrs = {
 	            blur: nu,
@@ -7925,6 +7925,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      {
 	        var c = {};
 	        var z = 1/this.paper._viewBoxShift.scale;
+		    //huangqing fix z=1
+			var z = 1;
 	        c.x = b.x - this.paper._viewBoxShift.dx;
 	        c.x *= z;
 	        c.y = b.y - this.paper._viewBoxShift.dy;
