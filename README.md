@@ -179,11 +179,12 @@ $(function () {
 ## 启动Web服务
 
 ~~~
-cnpm install http-server -g
+npm install http-server -g
 ~~~
 
 terminal:
-~~
+
+~~~
 http-server
-~~
+~~~
 
