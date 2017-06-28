@@ -116,7 +116,64 @@ $(function () {
 });
 ~~~
 
+![示例效果](https://github.com/huang-qing/timeline/raw/master/timeline-theme-gray.png)
+
+### 支持自定义皮肤样式
+
+```javascript
+
+        opt.theme = {
+            lengend: {
+                fill: "#000000",
+            },
+            startNode: {
+                radius: 10,
+                fill: "#7E899D"
+            },
+            endNode: {
+                radius: 10,
+                fill: "#7E899D"
+            },
+            centralAxisNode: {
+                height: 21,
+                radius: 4,
+                fill: "#1A84CE",
+                color: "#ffffff",
+                inner: {
+                    fill: "#1A84CE",
+                    "stroke-width": 0,
+                    stroke: "#1A84CE"
+                },
+                outer: {
+                    fill: "#1A84CE",
+                    "stroke-width": 3,
+                    stroke: "#1A84CE"
+                }
+            },
+            centralAxisLine: {
+                fill: "#7E899D"
+            },
+            centralAxisBranchNode: {
+                fill: "#F9BF3B",
+                radius: 10
+            },
+            centralAxisBranchLine: {
+                stroke: '#F9BF3B',
+                fill: "#F9BF3B"
+            },
+            centralAxisBranchContent: {
+                fill: "#F9BF3B",
+                color: "#ffffff",
+                stroke: '#ffffff',
+                height: 24
+            }
+        }
+
+```
+
 ![示例效果](https://github.com/huang-qing/timeline/raw/master/timeline-demo.png)
+
+
 
 
 ## 启动Web服务
