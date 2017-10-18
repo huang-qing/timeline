@@ -4,7 +4,7 @@
  * Includes jquery.js
  * Includes raphael.js
  * 
- * Copyright © 2016-2016 huangqing
+ * Copyright © 2016-2017 huangqing
  * Released under the MIT license
  *
  * Date: 2016-11-15
@@ -456,6 +456,9 @@
                 _legend = opt.legend || [];
                 data = opt.data || [];
 
+                if (_legend.length === 0) {
+                    legendHeight = 0;
+                }
                 //将图例数据格式转换为以name类型为键值的对象
                 for (var i = 0, len = _legend.length; i < len; i++) {
                     item = _legend[i];

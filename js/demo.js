@@ -249,6 +249,8 @@ $(function () {
         }
     }
 
+    opt1.legend=null;
+
     var theme = 'default';
 
     $("#demo").timeline(opt1);
