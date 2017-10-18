@@ -249,11 +249,30 @@ $(function () {
         }
     }
 
-    opt1.legend=null;
+    opt1.legend = null;
 
     var theme = 'default';
 
-    $("#demo").timeline(opt1);
+    var opt3 = {
+        legend: [],
+        data: [{
+                text: "主节点1",
+                children: []
+            },
+            {
+                text: "主节点2"
+            },
+            {
+                text: "主节点3",
+                children: []
+            },
+            {
+                text: "主节点4"
+            }
+        ]
+    };
+
+    $("#demo").timeline(opt2);
 
     $("#reload").click(function () {
 
