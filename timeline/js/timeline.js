@@ -131,7 +131,7 @@
                 var theme = getTheme().startNode,
                     r = theme.radius,
                     bgColor = theme.fill,
-                    lineWidth = 80;
+                    lineWidth = 60;
 
                 x += r;
 
@@ -141,7 +141,7 @@
                     stroke: bgColor
                 });
 
-                paper.path("M" + x + " " + y + "L" + (x + lineWidth) + " " + y).attr({
+                paper.path("M" + x + " " + y + "L" + (x + lineWidth - 10) + " " + y).attr({
                     "stroke-width": 2,
                     stroke: bgColor,
                     "stroke-dasharray": ["-"]
