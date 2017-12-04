@@ -272,6 +272,8 @@ $(function () {
         ]
     };
 
+    //opt2.data = [];
+
     $("#demo").timeline(opt2);
 
     $("#reload").click(function () {

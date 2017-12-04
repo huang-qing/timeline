@@ -465,6 +465,10 @@
                     legend[item.name] = item;
                 }
 
+                if (!data || data.length === 0) {
+                    return;
+                }
+
                 //创建开始节点
                 createStartNode(startX, startY);
                 //创建内容节点
