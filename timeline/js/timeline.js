@@ -81,7 +81,7 @@
             //设置x轴结束位置
             function setEndX(x) {
                 if (endX < x) {
-                    endX = x;
+                    endX = Math.ceil(x);
                 }
             }
 
